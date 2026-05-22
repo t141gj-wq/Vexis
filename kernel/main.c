@@ -2,13 +2,14 @@
  * Vexis OS - Kernel Main
  * Fast, lightweight operating system with strict 1.5GB RAM limit
  * Custom built from scratch
+ * Windows/Geobook ready
  */
 
 #include "../include/stdint.h"
 #include "../include/stddef.h"
 
-/* Memory constraints */
-#define MAX_RAM_MB 1536              /* 1.5GB maximum RAM */
+/* Memory constraints - STRICTLY 1536MB */
+#define MAX_RAM_MB 1536              /* 1.5GB maximum RAM - NEVER EXCEED */
 #define MAX_RAM_BYTES (MAX_RAM_MB * 1024 * 1024)
 #define KERNEL_BASE 0x100000         /* 1MB kernel base */
 
@@ -44,7 +45,7 @@ void free_memory(uint32_t size);
 void kernel_main(void) {
     clear_screen();
     
-    /* Print Vexis Computing banner */
+    /* Print Vexis Computing banner - exact specification */
     print("=============================================\n");
     print("╔═══════════════════════════════════════════╗\n");
     print("║  ⚡  V E X I S   C O M P U T I N G  ⚡   ║\n");
@@ -186,7 +187,7 @@ void process_command(const char *cmd) {
 
 /*
  * Allocate memory (simple allocator)
- * RULE: Never exceed 1536 MB
+ * RULE: Never exceed 1536 MB - STRICTLY ENFORCED
  */
 uint32_t allocate_memory(uint32_t size) {
     if (allocated_memory + size > MAX_RAM_BYTES) {
