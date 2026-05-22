@@ -33,9 +33,9 @@ void process_command(const char *cmd);
 uint32_t allocate_memory(uint32_t size);
 void free_memory(uint32_t size);
 
-/* Color codes for bright green text */
+/* Color codes for bright cyan text */
+#define COLOR_CYAN_BG 0x0b    /* Bright cyan on black */
 #define COLOR_GREEN_BG 0x0a   /* Bright green on black */
-#define COLOR_CYAN_BG 0x0b    /* Cyan on black */
 #define COLOR_WHITE_BG 0x0f   /* White on black */
 
 /*
@@ -43,18 +43,25 @@ void free_memory(uint32_t size);
  */
 void kernel_main(void) {
     clear_screen();
-    print("\n");
-    print("  ===== V E X I S   O S =====\n");
-    print("  BUILT BY t141gj-wq\n");
-    print("  FAST - LIGHT - POWERFUL\n");
-    print("  ============================\n\n");
-    print("  Memory Limit: 1.5 GB (1536 MB)\n");
-    print("  Status: RUNNING\n\n");
     
-    /* Initialize kernel systems */
-    print("  [*] Kernel initialized\n");
-    print("  [*] Memory protection enabled\n");
-    print("  [*] Command line ready\n\n");
+    /* Print Vexis Computing banner */
+    print("=============================================\n");
+    print("╔═══════════════════════════════════════════╗\n");
+    print("║  ⚡  V E X I S   C O M P U T I N G  ⚡   ║\n");
+    print("║                                           ║\n");
+    print("║   ░░░░▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀░░░░    ║\n");
+    print("║   ░░  ███████╗ ███████╗██╗  ██╗███████╗ ░░  ║\n");
+    print("║   ░░  ██╔══██╗██╔════╝██║ ██╔╝██╔════╝ ░░  ║\n");
+    print("║   ░░  ██║  ██║█████╗  █████╔╝ █████╗   ░░  ║\n");
+    print("║   ░░  ██║  ██║██╔══╝  ██╔═██╗ ██╔══╝   ░░  ║\n");
+    print("║   ░░  ███████╔╝███████╗██║  ██╗███████╗ ░░  ║\n");
+    print("║   ░░  ╚══════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ░░  ║\n");
+    print("║   ░░░░▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄░░░░    ║\n");
+    print("║                                           ║\n");
+    print("║        BUILT BY t141gj-wq                ║\n");
+    print("║      FAST • LIGHT • POWERFUL             ║\n");
+    print("╚═══════════════════════════════════════════╝\n");
+    print("=============================================\n\n");
     
     /* Main command loop */
     while (1) {
@@ -70,7 +77,7 @@ void kernel_main(void) {
  */
 void clear_screen(void) {
     uint16_t *video_mem = (uint16_t *)VIDEO_MEMORY;
-    uint16_t blank = (' ' << 8) | COLOR_GREEN_BG;
+    uint16_t blank = (' ' << 8) | COLOR_CYAN_BG;
     
     for (int i = 0; i < VIDEO_WIDTH * VIDEO_HEIGHT; i++) {
         video_mem[i] = blank;
@@ -106,7 +113,7 @@ void print(const char *str) {
     if (str == NULL) return;
     
     while (*str) {
-        print_char(*str, COLOR_GREEN_BG);
+        print_char(*str, COLOR_CYAN_BG);
         str++;
     }
 }
@@ -125,14 +132,14 @@ void read_command(char *buffer, uint32_t size) {
         
         if (c == 0x08 && pos > 0) {  /* Backspace */
             pos--;
-            print_char('\b', COLOR_GREEN_BG);
+            print_char('\b', COLOR_CYAN_BG);
         } else if (c == 0x0d) {       /* Enter */
             buffer[pos] = 0;
             print("\n");
             break;
         } else if (c >= 32 && c < 127) {
             buffer[pos++] = c;
-            print_char(c, COLOR_GREEN_BG);
+            print_char(c, COLOR_CYAN_BG);
         }
     }
     
@@ -205,7 +212,7 @@ void free_memory(uint32_t size) {
  */
 static void print_number(uint32_t num) {
     if (num == 0) {
-        print_char('0', COLOR_GREEN_BG);
+        print_char('0', COLOR_CYAN_BG);
         return;
     }
     
@@ -215,7 +222,7 @@ static void print_number(uint32_t num) {
     while (divisor > 0) {
         uint32_t digit = num / divisor;
         if (digit > 0 || started) {
-            print_char('0' + digit, COLOR_GREEN_BG);
+            print_char('0' + digit, COLOR_CYAN_BG);
             started = 1;
         }
         num %= divisor;
