@@ -1,54 +1,79 @@
-[BITS 16]
-[ORG 0x7C00]
-
 ; Vexis OS Bootloader
-; This is the first code that runs when the computer starts
-; It initializes the hardware and loads the kernel into memory
+; x86 16-bit bootloader code
+; Entry point for the operating system
 
-boot_start:
+bits 16
+org 0x7c00
+
+start:
     ; Clear screen and set video mode
-    mov ax, 0x0003        ; Set text mode 80x25
-    int 0x10              ; Call video BIOS interrupt
+    mov ax, 0x0003      ; 80x25 text mode
+    int 0x10
     
-    ; Set up stack pointer (memory area for temporary storage)
-    mov ax, 0x0000
-    mov ss, ax
-    mov sp, 0x7C00
+    ; Set cursor position to top-left
+    mov ah, 0x02
+    mov bh, 0x00        ; Page 0
+    mov dh, 2           ; Row 2
+    mov dl, 10          ; Column 10
+    int 0x10
     
-    ; Print welcome message: "Vexis OS"
-    mov ax, 0x0000
-    mov ds, ax
-    mov si, boot_message
+    ; Print Vexis OS title in bright green
+    mov si, title_msg
+    call print_string
+    
+    mov dh, 3
+    mov dl, 8
+    call set_cursor
+    mov si, author_msg
+    call print_string
+    
+    mov dh, 4
+    mov dl, 9
+    call set_cursor
+    mov si, tagline_msg
+    call print_string
+    
+    mov dh, 5
+    mov dl, 5
+    call set_cursor
+    mov si, border_msg
+    call print_string
+    
+    ; Wait for keypress
+    xor ax, ax
+    int 0x16
+    
+    ; Halt
+    cli
+    hlt
+
+set_cursor:
+    mov ah, 0x02
+    mov bh, 0x00
+    int 0x10
+    ret
+
+print_string:
+    mov ah, 0x0e        ; TTY print function
+    mov bh, 0x00        ; Page 0
+    mov bl, 0x0a        ; Green text attribute
     
 .print_loop:
-    lodsb                 ; Load byte from message
-    cmp al, 0             ; Check if end of string
+    lodsb               ; Load byte from string
+    cmp al, 0           ; Check for null terminator
     je .print_done
-    
-    ; Print character
-    mov ah, 0x0E          ; BIOS print character function
-    mov bh, 0x00          ; Page number
-    int 0x10              ; Call video BIOS
+    int 0x10
     jmp .print_loop
     
 .print_done:
-    ; Long jump to kernel at 0x1000:0x0000
-    jmp 0x1000:0x0000
-    
-    ; Hang if kernel returns
-    jmp $
+    ret
 
-; Message to display on boot
-boot_message:
-    db 13, 10             ; New line
-    db "========================================", 13, 10
-    db "     VEXIS OS - Booting...", 13, 10
-    db "========================================", 13, 10
-    db 0                  ; String terminator
+; Data section
+title_msg:      db '===== V E X I S   O S =====', 0
+author_msg:     db '  BUILT BY t141gj-wq', 0
+tagline_msg:    db '  FAST - LIGHT - POWERFUL', 0
+border_msg:     db '============================', 0
 
-; Padding to make bootloader exactly 512 bytes
-; Bootloader must be exactly one sector (512 bytes)
-times 510 - ($ - $$) db 0
-
-; Boot signature - tells BIOS this is bootable
-dw 0xAA55
+; Boot sector signature
+fill: times 510 - ($ - $$) db 0
+db 0x55, 0xaa
